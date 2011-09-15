@@ -25,7 +25,7 @@ role and so therefore has all the functionality implied therein.
         request_queue => 'test-net-kestrel',
         request => $req,
         response_queue_suffix => 'foobar',
-        max_results => 200
+        iterator_options => { max_results => 200 }
     );
 
     while ( my $block = $i->next ) {
