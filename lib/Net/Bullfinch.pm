@@ -1,5 +1,6 @@
 package Net::Bullfinch;
 use Moose;
+use MooseX::Params::Validate;
 
 # ABSTRACT: Perl wrapper for talking with Bullfinch
 
@@ -21,7 +22,11 @@ response and deletion of the response queue.
 
     my $client = Net::Bullfinch->new(host => '172.16.49.130');
     my $req = { statement => 'some-query' };
-    my $items = $client->send('test-net-kestrel', $req, 'foobar');
+    my $items = $client->send(
+        request_queue => 'test-net-kestrel',
+        request => $req,
+        response_queue_suffix => 'foobar'
+    );
 
 =cut
 
@@ -69,7 +74,7 @@ has 'timeout' => (
     default => 30000
 );
 
-=method send($queue, \%data, $response_name);
+=method send( request_queue => $queue, request => \%data, response_queue_suffix => $response_name);
 
 Send the request to the specified queue and await a response.  The data
 should be a hashref and the queuename (optional) will be appended to
@@ -85,7 +90,11 @@ arrayref to the caller.
 =cut
 
 sub send {
-    my ($self, $queue, $data, $queuename) = @_;
+    my ($self, $queue, $data, $queuename) = validated_list(\@_,
+        request_queue         => { isa => 'Str' },
+        request               => { isa => 'HashRef' },
+        response_queue_suffix => { isa => 'Str', optional => 1 }
+    );
 
     unless(defined($queue) && defined($data)) {
         die "Need queue name and data.";
