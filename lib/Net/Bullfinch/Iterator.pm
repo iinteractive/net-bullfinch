@@ -68,12 +68,17 @@ sub get_more {
 
         if ( defined $resp ) {
             $kestrel->confirm( $resp_queue, 1 );
-            push @results => decode_json( $resp );
+            my $decoded = decode_json( $resp );
+            if ( exists $decoded->{'EOF'} ) {
+                $self->_set_done;
+                last;
+            }
+            push @results => $decoded;
         }
 
         last if scalar @results == $self->max_results;
 
-        if (not defined $resp || $resp =~ /EOF/) {
+        if (not defined $resp) {
             $self->_set_done;
             last;
         }
@@ -96,11 +101,14 @@ sub all {
 
         if ( defined $resp ) {
             $kestrel->confirm( $resp_queue, 1 );
-            push @results => decode_json( $resp );
+            my $decoded = decode_json( $resp );
+            if ( exists $decoded->{'EOF'} ) {
+                last;
+            }
+            push @results => $decoded;
         }
 
         last if not defined $resp;
-        last if $resp =~ /EOF/;
     }
 
     $self->_set_done;

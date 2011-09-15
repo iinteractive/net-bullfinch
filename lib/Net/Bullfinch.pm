@@ -108,14 +108,14 @@ sub send {
         my $resp = $kes->get($rname, $self->timeout);
         if(defined($resp)) {
             $kes->confirm($rname, 1);
-            push(@items, decode_json($resp));
+            my $decoded = decode_json($resp);
+            if(exists($decoded->{EOF})) {
+                last;
+            }
+            push(@items, $decoded);
         }
 
         if(!defined($resp)) {
-            last;
-        }
-
-        if($resp =~ /EOF/) {
             last;
         }
     }
