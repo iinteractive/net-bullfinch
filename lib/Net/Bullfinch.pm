@@ -96,21 +96,7 @@ sub send {
         response_queue_suffix => { isa => 'Str', optional => 1 }
     );
 
-    unless(defined($queue) && defined($data)) {
-        die "Need queue name and data.";
-    }
-
-    # Make a copy of the hash so that we can add a key to it
-    my %copy = %{ $data };
-
-    my $rname = $self->response_prefix;
-    if(defined($queuename)) {
-        $rname .= $queuename
-    }
-
-    $copy{response_queue} = $rname;
-
-    my $json = encode_json(\%copy);
+    my ($rname, $json) = $self->_prepare_request($data, $queuename);
     my $kes = $self->_client;
 
     $kes->put($queue, $json);
@@ -134,6 +120,22 @@ sub send {
     $kes->delete($rname);
 
     return \@items;
+}
+
+sub _prepare_request {
+    my ($self, $data, $queuename) = @_;
+
+    # Make a copy of the hash so that we can add a key to it
+    my %copy = %{ $data };
+
+    my $rname = $self->response_prefix;
+    if(defined($queuename)) {
+        $rname .= $queuename
+    }
+
+    $copy{response_queue} = $rname;
+
+    return ($rname, encode_json(\%copy));
 }
 
 1;
