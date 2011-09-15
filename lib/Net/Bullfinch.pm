@@ -4,7 +4,7 @@ use MooseX::Params::Validate;
 
 # ABSTRACT: Perl wrapper for talking with Bullfinch
 
-use JSON;
+use JSON::XS;
 use Net::Kestrel;
 
 =head1 DESCRIPTION
