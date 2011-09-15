@@ -7,6 +7,8 @@ use MooseX::Params::Validate;
 use JSON::XS;
 use Net::Kestrel;
 
+use Net::Bullfinch::Iterator;
+
 =head1 DESCRIPTION
 
 Net::Bullfinch is a thin wrapper around <Net::Kestrel> for communicating with
@@ -120,6 +122,26 @@ sub send {
     $kes->delete($rname);
 
     return \@items;
+}
+
+sub iterate {
+    my ($self, $queue, $data, $queuename, $iterator_options) = validated_list(\@_,
+        request_queue         => { isa => 'Str' },
+        request               => { isa => 'HashRef' },
+        response_queue_suffix => { isa => 'Str', optional => 1 },
+        iterator_options      => { isa => 'HashRef', optional => 1 }
+    );
+
+    my ($rname, $json) = $self->_prepare_request($data, $queuename);
+    my $kes = $self->_client;
+
+    $kes->put($queue, $json);
+
+    Net::Bullfinch::Iterator->new(
+        bullfinch      => $self,
+        response_queue => $rname,
+        %$iterator_options
+    );
 }
 
 sub _prepare_request {
