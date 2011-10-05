@@ -4,6 +4,7 @@ use MooseX::Params::Validate;
 
 # ABSTRACT: Perl wrapper for talking with Bullfinch
 
+use Data::UUID;
 use JSON::XS;
 use Net::Kestrel;
 
@@ -29,6 +30,9 @@ response and deletion of the response queue.
         request => $req,
         response_queue_suffix => 'foobar'
     );
+    foreach my $item (@{ $items }) {
+        # whatever
+    }
 
 =cut
 
@@ -92,13 +96,14 @@ arrayref to the caller.
 =cut
 
 sub send {
-    my ($self, $queue, $data, $queuename) = validated_list(\@_,
+    my ($self, $queue, $data, $queuename, $trace) = validated_list(\@_,
         request_queue         => { isa => 'Str' },
         request               => { isa => 'HashRef' },
-        response_queue_suffix => { isa => 'Str', optional => 1 }
+        response_queue_suffix => { isa => 'Str', optional => 1 },
+        trace                 => { isa => 'Bool', default => 0, optional => 1 }
     );
 
-    my ($rname, $json) = $self->_prepare_request($data, $queuename);
+    my ($rname, $json) = $self->_prepare_request($data, $queuename, $trace);
     my $kes = $self->_client;
 
     $kes->put($queue, $json);
@@ -145,7 +150,7 @@ sub iterate {
 }
 
 sub _prepare_request {
-    my ($self, $data, $queuename) = @_;
+    my ($self, $data, $queuename, $trace) = @_;
 
     # Make a copy of the hash so that we can add a key to it
     my %copy = %{ $data };
@@ -156,6 +161,12 @@ sub _prepare_request {
     }
 
     $copy{response_queue} = $rname;
+
+    # User requested a trace, generate one
+    if($trace) {
+        my $ug = Data::UUID->new;
+        $copy{tracer} = $ug->create_str;
+    }
 
     return ($rname, encode_json(\%copy));
 }
