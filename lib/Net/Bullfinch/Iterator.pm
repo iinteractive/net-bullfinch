@@ -28,7 +28,7 @@ role and so therefore has all the functionality implied therein.
         iterator_options => { max_results => 200 }
     );
 
-    while ( my $block = $i->next ) {
+    while ( my $block = $items->next ) {
         foreach my $item ( @$block ) {
             # do something with each item ...
         }
