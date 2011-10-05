@@ -34,6 +34,26 @@ response and deletion of the response queue.
         # whatever
     }
 
+=begin :prelude
+
+=head1 TRACING
+
+Bullfinch supports adding a tracing a request so that performance metrics
+and responses can be tracked.
+
+    my $items = $client->send(
+        request_queue => 'test-net-kestrel',
+        request => $req,
+        response_queue_suffix => 'foobar'
+        trace => 1
+    );
+
+A UUID will be added to the request.  This UUID will be included in the
+performance code in bullfinch workers and included in the response you
+receive.
+
+=end :prelude
+
 =cut
 
 has '_client' => (
