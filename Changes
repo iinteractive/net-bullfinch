@@ -1,6 +1,7 @@
 Revision history for Net::Bullfinch
 
 {{$NEXT}}
+   * Add port as an attr (Stevan Little)
 
 0.01 Oct 5 2011
     * First release
