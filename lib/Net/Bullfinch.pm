@@ -61,7 +61,10 @@ has '_client' => (
     isa => 'Net::Kestrel',
     default => sub {
         my $self = shift;
-        return Net::Kestrel->new(host => $self->host);
+        return Net::Kestrel->new(
+            host => $self->host,
+            ($self->port ? (port => $self->port) : ())
+        );
     },
     lazy => 1
 );
@@ -75,6 +78,16 @@ has 'host' => (
     is => 'rw',
     isa => 'Str',
     required => 1
+);
+
+=attr port
+
+The port of the IP address of the host we'll be connecting to.
+
+=cut
+has 'port' => (
+    is => 'rw',
+    isa => 'Int'
 );
 
 =attr response_prefix
