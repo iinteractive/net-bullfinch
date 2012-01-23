@@ -1,6 +1,7 @@
 Revision history for Net::Bullfinch
 
 {{$NEXT}}
+   * Add process-by option
 
 0.02 Nov 27 2011
    * Add port as an attr (Stevan Little)

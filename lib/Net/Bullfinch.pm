@@ -1,6 +1,7 @@
 package Net::Bullfinch;
 use Moose;
 use MooseX::Params::Validate;
+use MooseX::Types::DateTime;
 
 # ABSTRACT: Perl wrapper for talking with Bullfinch
 
@@ -113,7 +114,7 @@ has 'timeout' => (
     default => 30000
 );
 
-=method send( request_queue => $queue, request => \%data, response_queue_suffix => $response_name);
+=method send( request_queue => $queue, request => \%data, response_queue_suffix => $response_name, process_by => $procby);
 
 Send the request to the specified queue and await a response.  The data
 should be a hashref and the queuename (optional) will be appended to
@@ -126,17 +127,20 @@ request.
 Any messages sent in response (save the EOF message) are returned as an
 arrayref to the caller.
 
+The optional C<process_by> must be an ISO 8601 date.
+
 =cut
 
 sub send {
-    my ($self, $queue, $data, $queuename, $trace) = validated_list(\@_,
+    my ($self, $queue, $data, $queuename, $trace, $procby) = validated_list(\@_,
         request_queue         => { isa => 'Str' },
         request               => { isa => 'HashRef' },
         response_queue_suffix => { isa => 'Str', optional => 1 },
-        trace                 => { isa => 'Bool', default => 0, optional => 1 }
+        trace                 => { isa => 'Bool', default => 0, optional => 1 },
+        process_by            => { isa =>  'DateTime', optional => 1 }
     );
 
-    my ($rname, $json) = $self->_prepare_request($data, $queuename, $trace);
+    my ($rname, $json) = $self->_prepare_request($data, $queuename, $trace, $procby);
     my $kes = $self->_client;
 
     $kes->put($queue, $json);
@@ -183,7 +187,7 @@ sub iterate {
 }
 
 sub _prepare_request {
-    my ($self, $data, $queuename, $trace) = @_;
+    my ($self, $data, $queuename, $trace, $procby) = @_;
 
     # Make a copy of the hash so that we can add a key to it
     my %copy = %{ $data };
@@ -199,6 +203,10 @@ sub _prepare_request {
     if($trace) {
         my $ug = Data::UUID->new;
         $copy{tracer} = $ug->create_str;
+    }
+    
+    if($procby) {
+        $copy{'process-by'} = $procby;
     }
 
     return ($rname, encode_json(\%copy));
