@@ -137,7 +137,7 @@ sub send {
         request               => { isa => 'HashRef' },
         response_queue_suffix => { isa => 'Str', optional => 1 },
         trace                 => { isa => 'Bool', default => 0, optional => 1 },
-        process_by            => { isa =>  'DateTime', optional => 1 }
+        process_by            => { isa => 'DateTime', optional => 1 }
     );
 
     my ($rname, $json) = $self->_prepare_request($data, $queuename, $trace, $procby);
@@ -206,7 +206,7 @@ sub _prepare_request {
     }
     
     if($procby) {
-        $copy{'process-by'} = $procby;
+        $copy{'process-by'} = $procby->iso8601;
     }
 
     return ($rname, encode_json(\%copy));
