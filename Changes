@@ -1,6 +1,8 @@
 Revision history for Net::Bullfinch
 
 {{$NEXT}}
+   * Use Memcached::Client in lieu of Net::Kestrel, as it's likely
+     much more reliable.
    * Add process-by option
 
 0.02 Nov 27 2011

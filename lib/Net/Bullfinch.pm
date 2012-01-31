@@ -7,13 +7,13 @@ use MooseX::Types::DateTime;
 
 use Data::UUID;
 use JSON::XS;
-use Net::Kestrel;
+use Memcached::Client;
 
 use Net::Bullfinch::Iterator;
 
 =head1 DESCRIPTION
 
-Net::Bullfinch is a thin wrapper around <Net::Kestrel> for communicating with
+Net::Bullfinch is a thin wrapper around L<Memcached::Client> for communicating with
 a L<Bullfinch|https://github.com/gphat/bullfinch/>.
 
 This module handles JSON encoding of the request, the addition of a response
@@ -59,13 +59,12 @@ receive.
 
 has '_client' => (
     is => 'rw',
-    isa => 'Net::Kestrel',
+    isa => 'Memcached::Client',
     default => sub {
         my $self = shift;
-        return Net::Kestrel->new(
-            host => $self->host,
-            ($self->port ? (port => $self->port) : ())
-        );
+        return Memcached::Client->new ({
+            servers => [ $self->host.':'.$self->port ]
+        });
     },
     lazy => 1
 );
@@ -88,7 +87,8 @@ The port of the IP address of the host we'll be connecting to.
 =cut
 has 'port' => (
     is => 'rw',
-    isa => 'Int'
+    isa => 'Int',
+    default => '22133'
 );
 
 =attr response_prefix
@@ -143,13 +143,14 @@ sub send {
     my ($rname, $json) = $self->_prepare_request($data, $queuename, $trace, $procby);
     my $kes = $self->_client;
 
-    $kes->put($queue, $json);
+    $kes->set($queue, $json);
 
     my @items = ();
     while(1) {
-        my $resp = $kes->get($rname, $self->timeout);
+        #my $resp = $kes->get($rname, $self->timeout);
+        my $resp = $kes->get($rname.'/t='.$self->timeout.'/open');
         if(defined($resp)) {
-            $kes->confirm($rname, 1);
+            $kes->get($rname.'/close');
             my $decoded = decode_json($resp);
             if(exists($decoded->{EOF})) {
                 last;
@@ -177,7 +178,7 @@ sub iterate {
     my ($rname, $json) = $self->_prepare_request($data, $queuename);
     my $kes = $self->_client;
 
-    $kes->put($queue, $json);
+    $kes->set($queue, $json);
 
     Net::Bullfinch::Iterator->new(
         bullfinch      => $self,
