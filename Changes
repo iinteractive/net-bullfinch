@@ -1,6 +1,8 @@
 Revision history for Net::Bullfinch
 
 {{$NEXT}}
+
+0.04 Feb 7 2012
    * Use Memcached::Client in lieu of Net::Kestrel, as it's likely
      much more reliable.
 
