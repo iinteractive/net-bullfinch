@@ -1,6 +1,8 @@
 Revision history for Net::Bullfinch
 
 {{$NEXT}}
+
+0.05 Feb 8 2012
    * Add expire support for requests
 
 0.04 Feb 7 2012
