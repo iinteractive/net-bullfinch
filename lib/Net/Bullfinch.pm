@@ -114,7 +114,7 @@ has 'timeout' => (
     default => 30000
 );
 
-=method send( request_queue => $queue, request => \%data, response_queue_suffix => $response_name, process_by => $procby);
+=method send( request_queue => $queue, request => \%data, response_queue_suffix => $response_name, process_by => $procby, expiration => $expire);
 
 Send the request to the specified queue and await a response.  The data
 should be a hashref and the queuename (optional) will be appended to
@@ -129,21 +129,25 @@ arrayref to the caller.
 
 The optional C<process_by> must be an ISO 8601 date.
 
+The optional C<expiration> is the number of seconds this request should live
+in the queue before expiring.
+
 =cut
 
 sub send {
-    my ($self, $queue, $data, $queuename, $trace, $procby) = validated_list(\@_,
+    my ($self, $queue, $data, $queuename, $trace, $procby, $expire) = validated_list(\@_,
         request_queue         => { isa => 'Str' },
         request               => { isa => 'HashRef' },
         response_queue_suffix => { isa => 'Str', optional => 1 },
         trace                 => { isa => 'Bool', default => 0, optional => 1 },
-        process_by            => { isa => 'DateTime', optional => 1 }
+        process_by            => { isa => 'DateTime', optional => 1 },
+        expiration            => { isa => 'Int', optional => 1 }
     );
 
     my ($rname, $json) = $self->_prepare_request($data, $queuename, $trace, $procby);
     my $kes = $self->_client;
 
-    $kes->set($queue, $json);
+    $kes->set($queue, $json, $expire);
 
     my @items = ();
     while(1) {
