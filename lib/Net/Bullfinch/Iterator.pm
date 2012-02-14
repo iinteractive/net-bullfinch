@@ -64,7 +64,7 @@ sub get_more {
     my @results;
 
     while ( 1 ) {
-        my $resp = $kes->get($rname.'/t='.$timeout);
+        my $resp = $kestrel->get($resp_queue.'/t='.$timeout);
 
         if ( defined $resp ) {
             my $decoded = decode_json( $resp );
