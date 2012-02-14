@@ -1,6 +1,8 @@
 Revision history for Net::Bullfinch
 
 {{$NEXT}}
+   * Fix busted iterator
+   * Don't bother with /open and /close
 
 0.05 Feb 8 2012
    * Add expire support for requests

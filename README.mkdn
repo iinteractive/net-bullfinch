@@ -4,7 +4,7 @@ Net::Bullfinch - Perl wrapper for talking with Bullfinch
 
 # VERSION
 
-version 0.04
+version 0.05
 
 # SYNOPSIS
 
@@ -67,7 +67,7 @@ back from Bullfinch.
 
 # METHODS
 
-## send( request_queue => $queue, request => \%data, response_queue_suffix => $response_name, process_by => $procby);
+## send( request_queue => $queue, request => \%data, response_queue_suffix => $response_name, process_by => $procby, expiration => $expire);
 
 Send the request to the specified queue and await a response.  The data
 should be a hashref and the queuename (optional) will be appended to
@@ -81,6 +81,9 @@ Any messages sent in response (save the EOF message) are returned as an
 arrayref to the caller.
 
 The optional `process_by` must be an ISO 8601 date.
+
+The optional `expiration` is the number of seconds this request should live
+in the queue before expiring.
 
 # AUTHOR
 

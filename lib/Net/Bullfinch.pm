@@ -151,10 +151,8 @@ sub send {
 
     my @items = ();
     while(1) {
-        #my $resp = $kes->get($rname, $self->timeout);
-        my $resp = $kes->get($rname.'/t='.$self->timeout.'/open');
+        my $resp = $kes->get($rname.'/t='.$self->timeout);
         if(defined($resp)) {
-            $kes->get($rname.'/close');
             my $decoded = decode_json($resp);
             if(exists($decoded->{EOF})) {
                 last;

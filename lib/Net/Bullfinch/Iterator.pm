@@ -64,10 +64,9 @@ sub get_more {
     my @results;
 
     while ( 1 ) {
-        my $resp = $kestrel->get( $resp_queue, $timeout );
+        my $resp = $kes->get($rname.'/t='.$timeout);
 
         if ( defined $resp ) {
-            $kestrel->confirm( $resp_queue, 1 );
             my $decoded = decode_json( $resp );
             if ( exists $decoded->{'EOF'} ) {
                 $self->_set_done;
