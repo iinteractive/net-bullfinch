@@ -1,6 +1,7 @@
 Revision history for Net::Bullfinch
 
 {{$NEXT}}
+   * More iterator fixes.
 
 0.06 Feb 14 2012
    * Fix busted iterator
