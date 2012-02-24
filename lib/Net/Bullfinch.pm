@@ -147,7 +147,8 @@ sub send {
     my ($rname, $json) = $self->_prepare_request($data, $queuename, $trace, $procby);
     my $kes = $self->_client;
 
-    $kes->set($queue, $json, $expire);
+    my $src = $kes->set($queue, $json, $expire);
+    die "Failed to send request!" unless $src;
 
     my @items = ();
     while(1) {
@@ -164,7 +165,8 @@ sub send {
             last;
         }
     }
-    $kes->delete($rname);
+    my $drc = $kes->delete($rname);
+    warn "Failed to delete response queue!" unless $drc;
 
     return \@items;
 }
