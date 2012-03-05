@@ -21,7 +21,7 @@ role and so therefore has all the functionality implied therein.
 
     my $client = Net::Bullfinch->new(host => '172.16.49.130');
     my $req = { statement => 'some-query' };
-    my $items = $client->send(
+    my $items = $client->iterate(
         request_queue => 'test-net-kestrel',
         request => $req,
         response_queue_suffix => 'foobar',

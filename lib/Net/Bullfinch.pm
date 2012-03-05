@@ -20,6 +20,9 @@ This module handles JSON encoding of the request, the addition of a response
 queue, waiting for a response, confirmation of the message, decoding of the
 response and deletion of the response queue.
 
+If you're expecting large numbers of results you might enjoy using
+L<Net::Bullfinch::Iterator> to return any given number of max_results at a time.
+
 =head1 SYNOPSIS
 
     use Net::Bullfinch;
