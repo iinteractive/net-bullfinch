@@ -1,6 +1,8 @@
 Revision history for Net::Bullfinch
 
 {{$NEXT}}
+
+0.08 Mar 12 2012
    * Die if sending the request fails and warn if deleting the response fails.
    * Doc fixes (Jay Hannah)
 
