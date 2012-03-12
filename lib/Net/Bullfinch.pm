@@ -135,6 +135,8 @@ The optional C<process_by> must be an ISO 8601 date.
 The optional C<expiration> is the number of seconds this request should live
 in the queue before expiring.
 
+B<Note:> Send will die if it fails to properly enqueue the request.
+
 =cut
 
 sub send {

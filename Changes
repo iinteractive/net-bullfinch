@@ -2,6 +2,7 @@ Revision history for Net::Bullfinch
 
 {{$NEXT}}
    * Die if sending the request fails and warn if deleting the response fails.
+   * Doc fixes
 
 0.07 Feb 15 2012
    * More iterator fixes.
