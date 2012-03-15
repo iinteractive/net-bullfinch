@@ -4,7 +4,7 @@ Net::Bullfinch - Perl wrapper for talking with Bullfinch
 
 # VERSION
 
-version 0.07
+version 0.08
 
 # SYNOPSIS
 
@@ -29,6 +29,9 @@ a [Bullfinch](https://github.com/gphat/bullfinch/).
 This module handles JSON encoding of the request, the addition of a response
 queue, waiting for a response, confirmation of the message, decoding of the
 response and deletion of the response queue.
+
+If you're expecting large numbers of results you might enjoy using
+[Net::Bullfinch::Iterator](http://search.cpan.org/perldoc?Net::Bullfinch::Iterator) to return any given number of max_results at a time.
 
 # TRACING
 
@@ -84,6 +87,8 @@ The optional `process_by` must be an ISO 8601 date.
 
 The optional `expiration` is the number of seconds this request should live
 in the queue before expiring.
+
+__Note:__ Send will die if it fails to properly enqueue the request.
 
 # AUTHOR
 
