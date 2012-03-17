@@ -4,6 +4,8 @@ use Moose;
 # ABSTRACT: A way to iterator over results from Bullfinch
 
 use JSON::XS;
+use Try::Tiny;
+use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
 
 use Net::Bullfinch;
 
@@ -67,7 +69,7 @@ sub get_more {
         my $resp = $kestrel->get($resp_queue.'/t='.$timeout);
 
         if ( defined $resp ) {
-            my $decoded = decode_json( $resp );
+            my $decoded = $self->decode( $resp );
             if ( exists $decoded->{'EOF'} ) {
                 $self->_set_done;
                 last;
@@ -99,7 +101,7 @@ sub all {
         my $resp = $kestrel->get( $resp_queue.'/t='.$timeout );
 
         if ( defined $resp ) {
-            my $decoded = decode_json( $resp );
+            my $decoded = $self->decode( $resp );
             if ( exists $decoded->{'EOF'} ) {
                 last;
             }
@@ -117,6 +119,24 @@ sub all {
 sub finished {
     my $self = shift;
     $self->bullfinch->_client->delete( $self->response_queue )
+}
+
+sub decode {
+    my ($self, $in) = @_;
+    my $decoded;
+    try {
+        $decoded = decode_json( $in );
+    } catch {
+        # Sometimes the payload is gzip'd...
+        my $input = \$in;
+        my $o = 0;
+        my $output = \$o;
+        no strict 'refs';
+        my $status = gunzip $input => $output
+            or die "gunzip failed: $GunzipError\n";
+        $decoded = decode_json( $$output );
+    };
+    return $decoded;
 }
 
 sub loaded { 1 }
