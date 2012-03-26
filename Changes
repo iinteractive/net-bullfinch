@@ -1,6 +1,8 @@
 Revision history for Net::Bullfinch
 
 {{$NEXT}}
+
+0.09 Mar 26 2012
   * Add queue name checking to prevent bad queue names from causing problems.
 
 0.08 Mar 12 2012
