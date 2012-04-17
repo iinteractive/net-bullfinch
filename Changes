@@ -1,6 +1,8 @@
 Revision history for Net::Bullfinch
 
 {{$NEXT}}
+
+0.10 Apr 17 2012
   * Fix bug in queue name checking (Jay Hannah)
 
 0.09 Mar 26 2012
