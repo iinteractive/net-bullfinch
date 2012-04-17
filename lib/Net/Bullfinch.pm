@@ -14,7 +14,7 @@ use Net::Bullfinch::Iterator;
 
 subtype 'QueueName',
     as 'Str',
-    where { $_ =~ /^[a-zA-Z0-0_-]*$/ };
+    where { $_ =~ /^[a-zA-Z0-9_-]*$/ };
 
 =head1 DESCRIPTION
 
