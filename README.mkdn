@@ -4,7 +4,7 @@ Net::Bullfinch - Perl wrapper for talking with Bullfinch
 
 # VERSION
 
-version 0.10
+version 0.11
 
 # SYNOPSIS
 
@@ -67,6 +67,12 @@ The prefix used for the name of the response queue.
 
 Set the timeout (in milliseconds) that will be used when awaiting a response
 back from Bullfinch.
+
+## error_on_no_response
+
+Set an error explicitly when there is no response from bullfinch default
+behavior is false which will return them same empty array is for success or
+timeout on insert/delete/update statements 
 
 # METHODS
 
