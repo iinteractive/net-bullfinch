@@ -122,6 +122,21 @@ has 'timeout' => (
     default => 30000
 );
 
+=attr error_on_no_response
+
+Set an error explicitly when there is no response from Team server
+default behavior is false which will 
+returned them same empty array is 
+for success or timeout on insert/delete/update statements 
+
+=cut
+has 'error_on_no_response' => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0
+);
+
+
 =method send( request_queue => $queue, request => \%data, response_queue_suffix => $response_name, process_by => $procby, expiration => $expire);
 
 Send the request to the specified queue and await a response.  The data
@@ -172,8 +187,11 @@ sub send {
         }
 
         if(!defined($resp)) {
+            if ( $self->error_on_no_response  ) {
+                push @items,{ERROR=>"request not processed by $queue,$queuename"};
+            }
             last;
-        }
+         }
     }
     my $drc = $kes->delete($rname);
     warn "Failed to delete response queue!" unless $drc;
