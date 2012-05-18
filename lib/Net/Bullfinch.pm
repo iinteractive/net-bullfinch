@@ -124,10 +124,9 @@ has 'timeout' => (
 
 =attr error_on_no_response
 
-Set an error explicitly when there is no response from Team server
-default behavior is false which will 
-returned them same empty array is 
-for success or timeout on insert/delete/update statements 
+Set an error explicitly when there is no response from bullfinch default
+behavior is false which will return them same empty array is for success or
+timeout on insert/delete/update statements 
 
 =cut
 has 'error_on_no_response' => (
@@ -188,10 +187,10 @@ sub send {
 
         if(!defined($resp)) {
             if ( $self->error_on_no_response  ) {
-                push @items,{ERROR=>"request not processed by $queue,$queuename"};
+                push @items,{ ERROR => "no response from $queue,$queuename" };
             }
             last;
-         }
+        }
     }
     my $drc = $kes->delete($rname);
     warn "Failed to delete response queue!" unless $drc;
