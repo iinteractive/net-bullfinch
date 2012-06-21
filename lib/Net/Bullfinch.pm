@@ -149,6 +149,8 @@ request.
 Any messages sent in response (save the EOF message) are returned as an
 arrayref to the caller.
 
+The optional C<no_response> will cause no repsonse to be returned
+
 The optional C<process_by> must be an ISO 8601 date.
 
 The optional C<expiration> is the number of seconds this request should live
@@ -159,22 +161,30 @@ B<Note:> Send will die if it fails to properly enqueue the request.
 =cut
 
 sub send {
-    my ($self, $queue, $data, $queuename, $trace, $procby, $expire) = validated_list(\@_,
+    my ($self, $queue, $data, $queuename, $trace, $procby, $expire, $no_response ) = validated_list(\@_,
         request_queue         => { isa => 'QueueName' },
         request               => { isa => 'HashRef' },
         response_queue_suffix => { isa => 'QueueName', optional => 1 },
         trace                 => { isa => 'Bool', default => 0, optional => 1 },
         process_by            => { isa => 'DateTime', optional => 1 },
-        expiration            => { isa => 'Int', optional => 1 }
+        expiration            => { isa => 'Int', optional => 1 },
+        no_response           => { isa => 'Bool', default => 0, optional => 1 }
     );
 
-    my ($rname, $json) = $self->_prepare_request($data, $queuename, $trace, $procby);
+    
+    my ($rname, $json);
+    if ( $no_response ) {
+      ($rname, $json) = $self->_prepare_request($data, undef, undef, $trace, $procby);
+    } else {
+      ($rname, $json) = $self->_prepare_request($data, $queuename, $self->response_prefix, $trace, $procby);
+    }
     my $kes = $self->_client;
 
     my $src = $kes->set($queue, $json, $expire);
     die "Failed to send request!" unless $src;
-
     my @items = ();
+    return \@items if ( $no_response );
+
     while(1) {
         my $resp = $kes->get($rname.'/t='.$self->timeout);
         if(defined($resp)) {
@@ -219,17 +229,17 @@ sub iterate {
 }
 
 sub _prepare_request {
-    my ($self, $data, $queuename, $trace, $procby) = @_;
+    my ($self, $data, $queuename, $rname, $trace, $procby) = @_;
 
     # Make a copy of the hash so that we can add a key to it
     my %copy = %{ $data };
 
-    my $rname = $self->response_prefix;
-    if(defined($queuename)) {
-        $rname .= $queuename
+    if ( defined($queuename) ) {
+       if ( defined($rname) ) {
+          $rname .= $queuename;
+       }
     }
-
-    $copy{response_queue} = $rname;
+    $copy{response_queue} = $rname if ( $rname );
 
     # User requested a trace, generate one
     if($trace) {
