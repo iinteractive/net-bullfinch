@@ -216,7 +216,7 @@ sub iterate {
         iterator_options      => { isa => 'HashRef', optional => 1 }
     );
 
-    my ($rname, $json) = $self->_prepare_request($data, $queuename);
+    my ($rname, $json) = $self->_prepare_request($data, $queuename, $self->response_prefix);
     my $kes = $self->_client;
 
     $kes->set($queue, $json);
