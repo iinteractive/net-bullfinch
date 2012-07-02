@@ -149,7 +149,7 @@ request.
 Any messages sent in response (save the EOF message) are returned as an
 arrayref to the caller.
 
-The optional C<no_response> will cause no repsonse to be returned
+The optional C<no_response> will cause no response to be returned
 
 The optional C<process_by> must be an ISO 8601 date.
 
