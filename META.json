@@ -1,0 +1,59 @@
+{
+   "abstract" : "Perl wrapper for talking with Bullfinch",
+   "author" : [
+      "Cory G Watson <gphat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Bullfinch",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Stream::Bulk" : "0",
+            "Data::Stream::Bulk::DoneFlag" : "0",
+            "Data::UUID" : "0",
+            "JSON::XS" : "0",
+            "Memcached::Client" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Params::Validate" : "0",
+            "MooseX::Types::DateTime" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/iinteractive/net-bullfinch/issues"
+      },
+      "homepage" : "https://github.com/iinteractive/net-bullfinch",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/iinteractive/net-bullfinch.git",
+         "web" : "https://github.com/iinteractive/net-bullfinch"
+      }
+   },
+   "version" : "0.12"
+}
+
