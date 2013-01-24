@@ -1,7 +1,4 @@
 package Net::Bullfinch;
-{
-  $Net::Bullfinch::VERSION = '0.12';
-}
 use Moose;
 use MooseX::Params::Validate;
 use MooseX::Types::DateTime;
@@ -19,6 +16,54 @@ subtype 'QueueName',
     as 'Str',
     where { $_ =~ /^[a-zA-Z0-9_-]*$/ };
 
+=head1 DESCRIPTION
+
+Net::Bullfinch is a thin wrapper around L<Memcached::Client> for communicating with
+a L<Bullfinch|https://github.com/gphat/bullfinch/>.
+
+This module handles JSON encoding of the request, the addition of a response
+queue, waiting for a response, confirmation of the message, decoding of the
+response and deletion of the response queue.
+
+If you're expecting large numbers of results you might enjoy using
+L<Net::Bullfinch::Iterator> to return any given number of max_results at a time.
+
+=head1 SYNOPSIS
+
+    use Net::Bullfinch;
+
+    my $client = Net::Bullfinch->new(host => '172.16.49.130');
+    my $req = { statement => 'some-query' };
+    my $items = $client->send(
+        request_queue => 'test-net-kestrel',
+        request => $req,
+        response_queue_suffix => 'foobar'
+    );
+    foreach my $item (@{ $items }) {
+        # whatever
+    }
+
+=begin :prelude
+
+=head1 TRACING
+
+Bullfinch supports adding a tracing a request so that performance metrics
+and responses can be tracked.
+
+    my $items = $client->send(
+        request_queue => 'test-net-kestrel',
+        request => $req,
+        response_queue_suffix => 'foobar'
+        trace => 1
+    );
+
+A UUID will be added to the request.  This UUID will be included in the
+performance code in bullfinch workers and included in the response you
+receive.
+
+=end :prelude
+
+=cut
 
 has '_client' => (
     is => 'rw',
@@ -32,30 +77,58 @@ has '_client' => (
     lazy => 1
 );
 
+=attr host
+
+The IP address of the host that we'll be connecting to.
+
+=cut
 has 'host' => (
     is => 'rw',
     isa => 'Str',
     required => 1
 );
 
+=attr port
+
+The port of the IP address of the host we'll be connecting to.
+
+=cut
 has 'port' => (
     is => 'rw',
     isa => 'Int',
     default => '22133'
 );
 
+=attr response_prefix
+
+The prefix used for the name of the response queue.
+
+=cut
 has 'response_prefix' => (
     is => 'rw',
     isa => 'Str',
     default => 'response-net-kestrel-'
 );
 
+=attr timeout
+
+Set the timeout (in milliseconds) that will be used when awaiting a response
+back from Bullfinch.
+
+=cut
 has 'timeout' => (
     is => 'rw',
     isa => 'Int',
     default => 30000
 );
 
+=attr error_on_no_response
+
+Set an error explicitly when there is no response from bullfinch default
+behavior is false which will return them same empty array is for success or
+timeout on insert/delete/update statements 
+
+=cut
 has 'error_on_no_response' => (
     is => 'rw',
     isa => 'Bool',
@@ -63,6 +136,29 @@ has 'error_on_no_response' => (
 );
 
 
+=method send( request_queue => $queue, request => \%data, response_queue_suffix => $response_name, process_by => $procby, expiration => $expire);
+
+Send the request to the specified queue and await a response.  The data
+should be a hashref and the queuename (optional) will be appended to
+C<response_prefix>.  This allows you to create a unique response queue per
+request.
+
+    # Response queue will be "response-net-kestrel-foobar"
+    my $items = $client->send(\%data, "foobar");
+
+Any messages sent in response (save the EOF message) are returned as an
+arrayref to the caller.
+
+The optional C<no_response> will cause no response to be returned
+
+The optional C<process_by> must be an ISO 8601 date.
+
+The optional C<expiration> is the number of seconds this request should live
+in the queue before expiring.
+
+B<Note:> Send will die if it fails to properly enqueue the request.
+
+=cut
 
 sub send {
     my ($self, $queue, $data, $queuename, $trace, $procby, $expire, $no_response ) = validated_list(\@_,
@@ -159,120 +255,3 @@ sub _prepare_request {
 }
 
 1;
-
-__END__
-=pod
-
-=head1 NAME
-
-Net::Bullfinch - Perl wrapper for talking with Bullfinch
-
-=head1 VERSION
-
-version 0.12
-
-=head1 SYNOPSIS
-
-    use Net::Bullfinch;
-
-    my $client = Net::Bullfinch->new(host => '172.16.49.130');
-    my $req = { statement => 'some-query' };
-    my $items = $client->send(
-        request_queue => 'test-net-kestrel',
-        request => $req,
-        response_queue_suffix => 'foobar'
-    );
-    foreach my $item (@{ $items }) {
-        # whatever
-    }
-
-=head1 DESCRIPTION
-
-Net::Bullfinch is a thin wrapper around L<Memcached::Client> for communicating with
-a L<Bullfinch|https://github.com/gphat/bullfinch/>.
-
-This module handles JSON encoding of the request, the addition of a response
-queue, waiting for a response, confirmation of the message, decoding of the
-response and deletion of the response queue.
-
-If you're expecting large numbers of results you might enjoy using
-L<Net::Bullfinch::Iterator> to return any given number of max_results at a time.
-
-=head1 TRACING
-
-Bullfinch supports adding a tracing a request so that performance metrics
-and responses can be tracked.
-
-    my $items = $client->send(
-        request_queue => 'test-net-kestrel',
-        request => $req,
-        response_queue_suffix => 'foobar'
-        trace => 1
-    );
-
-A UUID will be added to the request.  This UUID will be included in the
-performance code in bullfinch workers and included in the response you
-receive.
-
-=head1 ATTRIBUTES
-
-=head2 host
-
-The IP address of the host that we'll be connecting to.
-
-=head2 port
-
-The port of the IP address of the host we'll be connecting to.
-
-=head2 response_prefix
-
-The prefix used for the name of the response queue.
-
-=head2 timeout
-
-Set the timeout (in milliseconds) that will be used when awaiting a response
-back from Bullfinch.
-
-=head2 error_on_no_response
-
-Set an error explicitly when there is no response from bullfinch default
-behavior is false which will return them same empty array is for success or
-timeout on insert/delete/update statements 
-
-=head1 METHODS
-
-=head2 send( request_queue => $queue, request => \%data, response_queue_suffix => $response_name, process_by => $procby, expiration => $expire);
-
-Send the request to the specified queue and await a response.  The data
-should be a hashref and the queuename (optional) will be appended to
-C<response_prefix>.  This allows you to create a unique response queue per
-request.
-
-    # Response queue will be "response-net-kestrel-foobar"
-    my $items = $client->send(\%data, "foobar");
-
-Any messages sent in response (save the EOF message) are returned as an
-arrayref to the caller.
-
-The optional C<no_response> will cause no response to be returned
-
-The optional C<process_by> must be an ISO 8601 date.
-
-The optional C<expiration> is the number of seconds this request should live
-in the queue before expiring.
-
-B<Note:> Send will die if it fails to properly enqueue the request.
-
-=head1 AUTHOR
-
-Cory G Watson <gphat@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2012 by Infinity Interactive, Inc.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut
-
