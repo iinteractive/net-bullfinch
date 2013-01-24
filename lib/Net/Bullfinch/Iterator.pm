@@ -83,6 +83,8 @@ sub get_more {
         }
     }
 
+    return if !@results && $self->is_done;
+
     return \@results;
 }
 
