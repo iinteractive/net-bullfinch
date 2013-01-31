@@ -31,7 +31,7 @@ queue, waiting for a response, confirmation of the message, decoding of the
 response and deletion of the response queue.
 
 If you're expecting large numbers of results you might enjoy using
-[Net::Bullfinch::Iterator](http://search.cpan.org/perldoc?Net::Bullfinch::Iterator) to return any given number of max_results at a time.
+[Net::Bullfinch::Iterator](http://search.cpan.org/perldoc?Net::Bullfinch::Iterator) to return any given number of max\_results at a time.
 
 # TRACING
 
@@ -59,7 +59,7 @@ The IP address of the host that we'll be connecting to.
 
 The port of the IP address of the host we'll be connecting to.
 
-## response_prefix
+## response\_prefix
 
 The prefix used for the name of the response queue.
 
@@ -68,7 +68,7 @@ The prefix used for the name of the response queue.
 Set the timeout (in milliseconds) that will be used when awaiting a response
 back from Bullfinch.
 
-## error_on_no_response
+## error\_on\_no\_response
 
 Set an error explicitly when there is no response from bullfinch default
 behavior is false which will return them same empty array is for success or
@@ -76,7 +76,7 @@ timeout on insert/delete/update statements
 
 # METHODS
 
-## send( request_queue => $queue, request => \%data, response_queue_suffix => $response_name, process_by => $procby, expiration => $expire);
+## send( request\_queue => $queue, request => \\%data, response\_queue\_suffix => $response\_name, process\_by => $procby, expiration => $expire);
 
 Send the request to the specified queue and await a response.  The data
 should be a hashref and the queuename (optional) will be appended to
@@ -104,7 +104,7 @@ Cory G Watson <gphat@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Infinity Interactive, Inc.
+This software is copyright (c) 2013 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
