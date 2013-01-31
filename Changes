@@ -2,6 +2,12 @@ Revision history for Net::Bullfinch
 
 {{$NEXT}}
 
+0.13 Jan 31 2013
+  * Bugfix: Iterator ->next() no longer returns an empty array ref after 
+    returning all available rows. (Jesse Luehrs, Jay Hannah)
+
+0.12 Jun 02 2012
+
 0.11 May 18 2012
 
 0.10 Apr 17 2012
