@@ -126,7 +126,7 @@ has 'timeout' => (
 
 Set an error explicitly when there is no response from bullfinch default
 behavior is false which will return them same empty array is for success or
-timeout on insert/delete/update statements 
+timeout on insert/delete/update statements
 
 =cut
 has 'error_on_no_response' => (
@@ -171,7 +171,7 @@ sub send {
         no_response           => { isa => 'Bool', default => 0, optional => 1 }
     );
 
-    
+
     my ($rname, $json);
     if ( $no_response ) {
       ($rname, $json) = $self->_prepare_request($data, undef, undef, $trace, $procby);
@@ -246,7 +246,7 @@ sub _prepare_request {
         my $ug = Data::UUID->new;
         $copy{tracer} = $ug->create_str;
     }
-    
+
     if($procby) {
         $copy{'process-by'} = $procby->iso8601;
     }
