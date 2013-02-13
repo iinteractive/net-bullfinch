@@ -228,6 +228,41 @@ sub iterate {
     );
 }
 
+sub iterate_async {
+    my ($self, $queue, $data, $queuename, $expire, $error_cb, $result_cb) = validated_list(\@_,
+        request_queue         => { isa => 'Str' },
+        request               => { isa => 'HashRef' },
+        response_queue_suffix => { isa => 'Str', optional => 1 },
+        expiration            => { isa => 'Int', optional => 1 },
+        error_cb              => { isa => 'CodeRef' },
+        result_cb             => { isa => 'CodeRef' },
+    );
+
+    my ($rname, $json) = $self->_prepare_request($data, $queuename, $self->response_prefix);
+
+    my $request_row_async;
+    $request_row_async = sub {
+        $self->_client->set($queue, $json, $expire, sub {
+            my ($rc) = @_;
+            $error_cb->('Failed to send request!') unless $rc;
+
+            $self->_client->get($rname.'/t='.$self->timeout, sub {
+                my ($resp) = @_;
+                return $result_cb->() unless defined $resp;
+
+                my $decoded = decode_json $resp;
+                return $result_cb->() if exists $decoded->{EOF};
+
+                $result_cb->($decoded);
+
+                $request_row_async->();
+            });
+        });
+    };
+
+    $request_row_async->();
+}
+
 sub _prepare_request {
     my ($self, $data, $queuename, $rname, $trace, $procby) = @_;
 
