@@ -1,6 +1,8 @@
 Revision history for Net::Bullfinch
 
 {{$NEXT}}
+
+0.14 Feb 14 2013
   * Add ->iterate_asnc as an AnyEvent compatible way of making requests
     asynchronously (Florian Ragwitz).
 
