@@ -228,6 +228,33 @@ sub iterate {
     );
 }
 
+=method iterate_async( request_queue => $queue, request => \%data, response_queue_suffix => $response_name, expiration => $expire, result_cb => \&cb, error_cb => \&err_cb);
+
+Send the request to the specified queue asynchronously and register C<result_cb>
+and C<error_cb> to be called upon the arrival of any results or the occurence of
+an error, respectively.
+
+The data should be a hashref and the queuename (optional) will be appended to
+C<response_prefix>.  This allows you to create a unique response queue per
+request.
+
+Any messages received in response (save the EOF message) are passed to a call to
+the C<result_cb> as the only argument.
+
+The optional C<expiration> is the number of seconds this request should live
+in the queue before expiring.
+
+Encountering any errors, such as not being able to enqueue the request, will
+cause the C<error_cb> to be invoked with a string describing the error as the
+only argument.
+
+B<Note> that this method returns immediately after enqueueing the request. It's
+the callers responsibility to run an L<AnyEvent> compatible event loop in order
+for the enqueued request to actually be sent and the result callbacks to be
+invoked.
+
+=cut
+
 sub iterate_async {
     my ($self, $queue, $data, $queuename, $expire, $error_cb, $result_cb) = validated_list(\@_,
         request_queue         => { isa => 'Str' },
