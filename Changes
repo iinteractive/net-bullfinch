@@ -1,9 +1,11 @@
 Revision history for Net::Bullfinch
 
 {{$NEXT}}
+  * Add ->iterate_asnc as an AnyEvent compatible way of making requests
+    asynchronously (Florian Ragwitz).
 
 0.13 Jan 31 2013
-  * Bugfix: Iterator ->next() no longer returns an empty array ref after 
+  * Bugfix: Iterator ->next() no longer returns an empty array ref after
     returning all available rows. (Jesse Luehrs, Jay Hannah)
 
 0.12 Jun 02 2012
