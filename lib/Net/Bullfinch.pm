@@ -275,7 +275,7 @@ sub iterate_async {
 
             $self->_client->get($rname.'/t='.$self->timeout, sub {
                 my ($resp) = @_;
-                return $result_cb->() unless defined $resp;
+                return $error_cb->('timeout') unless defined $resp;
 
                 my $decoded = decode_json $resp;
                 return $result_cb->() if exists $decoded->{EOF};
