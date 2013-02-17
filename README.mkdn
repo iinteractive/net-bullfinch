@@ -4,7 +4,7 @@ Net::Bullfinch - Perl wrapper for talking with Bullfinch
 
 # VERSION
 
-version 0.14
+version 0.15
 
 # SYNOPSIS
 
