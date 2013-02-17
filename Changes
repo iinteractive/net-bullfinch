@@ -1,6 +1,8 @@
 Revision history for Net::Bullfinch
 
 {{$NEXT}}
+
+0.15 Feb 17 2013
   * Notify ->iterate_async users of request timeouts through the error
     callback (Florian Ragwitz).x
 
