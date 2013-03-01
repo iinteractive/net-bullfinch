@@ -1,6 +1,8 @@
 Revision history for Net::Bullfinch
 
 {{$NEXT}}
+
+0.16 Mar 1 2013
   * Don't schedule result retrieval when submitting the request failed in the
     first palce. All that means is waiting for a timeout (Florian Ragwitz).
 
