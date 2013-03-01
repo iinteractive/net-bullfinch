@@ -271,7 +271,7 @@ sub iterate_async {
     $request_row_async = sub {
         $self->_client->set($queue, $json, $expire, sub {
             my ($rc) = @_;
-            $error_cb->('Failed to send request!') unless $rc;
+            return $error_cb->('Failed to send request!') unless $rc;
 
             $self->_client->get($rname.'/t='.$self->timeout, sub {
                 my ($resp) = @_;
